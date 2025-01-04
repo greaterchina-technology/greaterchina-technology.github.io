@@ -1,1 +1,0 @@
-# greaterchina-technology.github.io
