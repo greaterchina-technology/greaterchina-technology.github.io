@@ -2,7 +2,21 @@ class Gallery {
     constructor() {
         this.groupA = document.querySelector('#group-a');
         this.groupB = document.querySelector('#group-b');
-        this.watermarkPath = 'waterMark/watermark.png'; // 水印路径
+        this.watermarkPath = 'waterMark/watermark.png';
+        this.setupModal();
+    }
+
+    setupModal() {
+        // 创建模态框
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `<div class="modal-content"><img src="" alt=""></div>`;
+        document.body.appendChild(modal);
+
+        // 点击模态框关闭
+        modal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
     }
 
     async init() {
@@ -31,11 +45,19 @@ class Gallery {
 
         const img = document.createElement('img');
         img.src = src;
-        img.loading = 'lazy'; // 懒加载优化
+        img.loading = 'lazy';
 
         const watermark = document.createElement('img');
         watermark.src = this.watermarkPath;
         watermark.className = 'watermark';
+
+        // 添加点击事件
+        photoItem.addEventListener('click', () => {
+            const modal = document.querySelector('.modal');
+            const modalImg = modal.querySelector('img');
+            modalImg.src = src;
+            modal.style.display = 'block';
+        });
 
         photoItem.appendChild(img);
         photoItem.appendChild(watermark);
