@@ -240,4 +240,41 @@ body {
         justify-content: center;
         margin: 2rem 0;
     }
+}
+
+.error-message {
+    padding: 20px;
+    text-align: center;
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+}
+
+.error-message small {
+    display: block;
+    margin-top: 5px;
+    color: #856404;
+}
+
+.projects-grid {
+    padding: 4rem 0;
+}
+
+.project-section {
+    margin-bottom: 4rem;
+}
+
+.project-section h2 {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
 } 

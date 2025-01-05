@@ -1,23 +1,8 @@
 class Gallery {
     constructor() {
-        this.currentGroup = null;
-        this.currentIndex = 0;
-        this.images = [];
-        this.setupGallery();
+        this.projectsContainer = document.querySelector('.projects-grid');
         this.setupModal();
-        
-        // 添加调试信息
-        console.log('Gallery initialized');
-        console.log('Config:', galleryConfig);
-    }
-
-    setupGallery() {
-        this.groupA = document.querySelector('#group-a .photo-grid');
-        this.groupB = document.querySelector('#group-b .photo-grid');
-        
-        if (!this.groupA || !this.groupB) {
-            console.error('Could not find photo grid containers');
-        }
+        this.loadProjects();
     }
 
     setupModal() {
@@ -25,11 +10,7 @@ class Gallery {
             <div class="modal">
                 <div class="modal-content">
                     <span class="modal-close">&times;</span>
-                    <img class="modal-image" src="" alt="">
-                    <div class="modal-nav">
-                        <button class="prev">&lt;</button>
-                        <button class="next">&gt;</button>
-                    </div>
+                    <img class="modal-image" src="" alt="大图">
                 </div>
             </div>
         `;
@@ -37,89 +18,92 @@ class Gallery {
 
         const modal = document.querySelector('.modal');
         const closeBtn = modal.querySelector('.modal-close');
-        const prevBtn = modal.querySelector('.prev');
-        const nextBtn = modal.querySelector('.next');
 
         closeBtn.addEventListener('click', () => this.closeModal());
-        prevBtn.addEventListener('click', () => this.showPrevImage());
-        nextBtn.addEventListener('click', () => this.showNextImage());
-
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) this.closeModal();
+        });
         document.addEventListener('keydown', (e) => {
-            if (!modal.style.display === 'block') return;
             if (e.key === 'Escape') this.closeModal();
-            if (e.key === 'ArrowLeft') this.showPrevImage();
-            if (e.key === 'ArrowRight') this.showNextImage();
         });
     }
 
-    init() {
-        console.log('Loading images...');
-        
-        // 加载A组所有图片
-        if (galleryConfig.groupA && galleryConfig.groupA.length > 0) {
-            console.log('Loading Group A images:', galleryConfig.groupA);
-            galleryConfig.groupA.forEach((src, index) => {
-                this.loadImage(src, this.groupA, 'A', index);
-            });
-        } else {
-            console.warn('No images found in Group A');
-        }
-
-        // 加载B组所有图片
-        if (galleryConfig.groupB && galleryConfig.groupB.length > 0) {
-            console.log('Loading Group B images:', galleryConfig.groupB);
-            galleryConfig.groupB.forEach((src, index) => {
-                this.loadImage(src, this.groupB, 'B', index);
-            });
-        } else {
-            console.warn('No images found in Group B');
+    async loadProjects() {
+        try {
+            // 获取Photos目录下的所有文件夹（项目）
+            const response = await fetch('https://api.github.com/repos/你的用户名/你的仓库名/contents/Photos');
+            const folders = await response.json();
+            
+            // 为每个项目创建展示区
+            for (const folder of folders) {
+                if (folder.type === 'dir') {
+                    await this.createProjectSection(folder);
+                }
+            }
+        } catch (error) {
+            console.error('加载项目失败:', error);
+            this.showError('无法加载项目列表');
         }
     }
 
-    loadImage(src, container, group, index) {
-        console.log(`Loading image: ${src}`);
-        this.createPhotoElement(src, container, group, index);
+    async createProjectSection(folder) {
+        try {
+            // 获取项目中的照片
+            const response = await fetch(folder.url);
+            const files = await response.json();
+            
+            // 过滤出图片文件
+            const images = files.filter(file => 
+                file.name.match(/\.(jpg|jpeg|png|gif)$/i)
+            );
+
+            if (images.length > 0) {
+                // 创建项目区块
+                const projectSection = document.createElement('div');
+                projectSection.className = 'project-section';
+                projectSection.innerHTML = `
+                    <h2>${folder.name}</h2>
+                    <div class="photo-grid"></div>
+                `;
+                
+                const photoGrid = projectSection.querySelector('.photo-grid');
+                
+                // 添加照片
+                images.forEach(image => {
+                    this.createPhotoElement(image.download_url, photoGrid);
+                });
+
+                this.projectsContainer.appendChild(projectSection);
+            }
+        } catch (error) {
+            console.error(`加载项目 ${folder.name} 失败:`, error);
+        }
     }
 
-    createPhotoElement(src, container, group, index) {
+    createPhotoElement(src, container) {
         const photoItem = document.createElement('div');
         photoItem.className = 'photo-item';
 
         const img = document.createElement('img');
         img.src = src;
         img.loading = 'lazy';
-        
-        // 增强错误处理
+
         img.onerror = () => {
-            console.error(`Failed to load image: ${src}`);
             photoItem.innerHTML = `
-                <div style="padding: 20px; text-align: center; color: red;">
-                    图片加载失败: ${src}
+                <div class="error-message">
+                    <p>图片加载失败</p>
                 </div>
             `;
         };
 
-        // 添加加载成功处理
-        img.onload = () => {
-            console.log(`Successfully loaded image: ${src}`);
-        };
-
-        photoItem.addEventListener('click', () => {
-            this.openModal(src, group, index);
-        });
-
+        photoItem.addEventListener('click', () => this.openModal(src));
         photoItem.appendChild(img);
         container.appendChild(photoItem);
     }
 
-    openModal(src, group, index) {
+    openModal(src) {
         const modal = document.querySelector('.modal');
         const modalImg = modal.querySelector('.modal-image');
-        
-        this.currentGroup = group;
-        this.currentIndex = index;
-        this.images = galleryConfig[`group${group}`];
-
         modalImg.src = src;
         modal.style.display = 'block';
     }
@@ -129,20 +113,14 @@ class Gallery {
         modal.style.display = 'none';
     }
 
-    showPrevImage() {
-        this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
-        const modalImg = document.querySelector('.modal-image');
-        modalImg.src = this.images[this.currentIndex];
-    }
-
-    showNextImage() {
-        this.currentIndex = (this.currentIndex + 1) % this.images.length;
-        const modalImg = document.querySelector('.modal-image');
-        modalImg.src = this.images[this.currentIndex];
+    showError(message) {
+        const error = document.createElement('div');
+        error.className = 'error-message';
+        error.textContent = message;
+        this.projectsContainer.appendChild(error);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const gallery = new Gallery();
-    gallery.init();
+    new Gallery();
 }); 
