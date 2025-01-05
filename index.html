@@ -9,21 +9,39 @@
 <body>
     <nav class="navigation">
         <div class="nav-container">
-            <h1>我的摄影世界</h1>
-            <ul>
+            <div class="logo">
+                <h1>我的摄影世界</h1>
+            </div>
+            <ul class="nav-menu">
                 <li><a href="#group-a">A组作品</a></li>
                 <li><a href="#group-b">B组作品</a></li>
             </ul>
         </div>
     </nav>
 
+    <header class="hero">
+        <div class="hero-content">
+            <h2>让美好触手可及！</h2>
+            <p>探索独特的视觉世界</p>
+        </div>
+    </header>
+
     <main>
         <div class="gallery-container">
-            <section id="group-a" class="photo-group">
-                <h2>A组作品</h2>
+            <section id="group-a" class="photo-section">
+                <div class="section-header">
+                    <h2>A组作品</h2>
+                    <p>精选摄影作品展示</p>
+                </div>
+                <div class="photo-grid"></div>
             </section>
-            <section id="group-b" class="photo-group">
-                <h2>B组作品</h2>
+            
+            <section id="group-b" class="photo-section">
+                <div class="section-header">
+                    <h2>B组作品</h2>
+                    <p>探索更多精彩瞬间</p>
+                </div>
+                <div class="photo-grid"></div>
             </section>
         </div>
     </main>
