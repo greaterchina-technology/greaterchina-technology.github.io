@@ -5,11 +5,19 @@ class Gallery {
         this.images = [];
         this.setupGallery();
         this.setupModal();
+        
+        // 添加调试信息
+        console.log('Gallery initialized');
+        console.log('Config:', galleryConfig);
     }
 
     setupGallery() {
         this.groupA = document.querySelector('#group-a .photo-grid');
         this.groupB = document.querySelector('#group-b .photo-grid');
+        
+        if (!this.groupA || !this.groupB) {
+            console.error('Could not find photo grid containers');
+        }
     }
 
     setupModal() {
@@ -45,22 +53,31 @@ class Gallery {
     }
 
     init() {
+        console.log('Loading images...');
+        
         // 加载A组所有图片
         if (galleryConfig.groupA && galleryConfig.groupA.length > 0) {
+            console.log('Loading Group A images:', galleryConfig.groupA);
             galleryConfig.groupA.forEach((src, index) => {
                 this.loadImage(src, this.groupA, 'A', index);
             });
+        } else {
+            console.warn('No images found in Group A');
         }
 
         // 加载B组所有图片
         if (galleryConfig.groupB && galleryConfig.groupB.length > 0) {
+            console.log('Loading Group B images:', galleryConfig.groupB);
             galleryConfig.groupB.forEach((src, index) => {
                 this.loadImage(src, this.groupB, 'B', index);
             });
+        } else {
+            console.warn('No images found in Group B');
         }
     }
 
     loadImage(src, container, group, index) {
+        console.log(`Loading image: ${src}`);
         this.createPhotoElement(src, container, group, index);
     }
 
@@ -71,9 +88,20 @@ class Gallery {
         const img = document.createElement('img');
         img.src = src;
         img.loading = 'lazy';
+        
+        // 增强错误处理
         img.onerror = () => {
-            console.error('Image failed to load:', src);
-            photoItem.style.display = 'none';
+            console.error(`Failed to load image: ${src}`);
+            photoItem.innerHTML = `
+                <div style="padding: 20px; text-align: center; color: red;">
+                    图片加载失败: ${src}
+                </div>
+            `;
+        };
+
+        // 添加加载成功处理
+        img.onload = () => {
+            console.log(`Successfully loaded image: ${src}`);
         };
 
         photoItem.addEventListener('click', () => {

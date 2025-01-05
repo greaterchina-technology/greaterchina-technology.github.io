@@ -1,13 +1,15 @@
 const galleryConfig = {
     groupA: [
-        'Photos/A/155159.png',
-        'Photos/A/another-photo.jpg',
-        'Photos/A/third-photo.png',
-        // 在这里添加A组的所有照片路径
+        'Photos/A/123.png'
+        // 以后A组新照片按以下格式添加：
+        // 'Photos/A/照片1.jpg',
+        // 'Photos/A/照片2.png',
+        // 'Photos/A/照片3.jpg'
     ],
     groupB: [
-        'Photos/B/photo1.jpg',
-        'Photos/B/photo2.png',
-        // 在这里添加B组的所有照片路径
+        // B组照片按以下格式添加：
+        // 'Photos/B/照片1.jpg',
+        // 'Photos/B/照片2.png',
+        // 'Photos/B/照片3.jpg'
     ]
 }; 
