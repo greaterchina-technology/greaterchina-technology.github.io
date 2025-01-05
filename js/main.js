@@ -44,15 +44,20 @@ class Gallery {
         });
     }
 
-    async init() {
-        // 直接加载A组图片
-        this.loadImage('Photos/A/155159.png', this.groupA, 'A', 0);
-        
-        // 如果有更多图片，可以继续添加
-        // this.loadImage('Photos/A/其他图片.jpg', this.groupA, 'A', 1);
-        
-        // B组图片
-        // this.loadImage('Photos/B/图片.jpg', this.groupB, 'B', 0);
+    init() {
+        // 加载A组所有图片
+        if (galleryConfig.groupA && galleryConfig.groupA.length > 0) {
+            galleryConfig.groupA.forEach((src, index) => {
+                this.loadImage(src, this.groupA, 'A', index);
+            });
+        }
+
+        // 加载B组所有图片
+        if (galleryConfig.groupB && galleryConfig.groupB.length > 0) {
+            galleryConfig.groupB.forEach((src, index) => {
+                this.loadImage(src, this.groupB, 'B', index);
+            });
+        }
     }
 
     loadImage(src, container, group, index) {
@@ -68,7 +73,7 @@ class Gallery {
         img.loading = 'lazy';
         img.onerror = () => {
             console.error('Image failed to load:', src);
-            photoItem.style.display = 'none'; // 如果图片加载失败就隐藏容器
+            photoItem.style.display = 'none';
         };
 
         photoItem.addEventListener('click', () => {
@@ -85,8 +90,7 @@ class Gallery {
         
         this.currentGroup = group;
         this.currentIndex = index;
-        this.images = Array.from(document.querySelectorAll(`#group-${group.toLowerCase()} img`))
-            .map(img => img.src);
+        this.images = galleryConfig[`group${group}`];
 
         modalImg.src = src;
         modal.style.display = 'block';
