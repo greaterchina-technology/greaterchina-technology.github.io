@@ -13,7 +13,6 @@ class Gallery {
     }
 
     setupModal() {
-        // 创建模态框
         const modalHTML = `
             <div class="modal">
                 <div class="modal-content">
@@ -37,7 +36,6 @@ class Gallery {
         prevBtn.addEventListener('click', () => this.showPrevImage());
         nextBtn.addEventListener('click', () => this.showNextImage());
 
-        // 键盘事件
         document.addEventListener('keydown', (e) => {
             if (!modal.style.display === 'block') return;
             if (e.key === 'Escape') this.closeModal();
@@ -47,25 +45,18 @@ class Gallery {
     }
 
     async init() {
-        await this.loadImages('A', this.groupA);
-        await this.loadImages('B', this.groupB);
+        // 直接加载A组图片
+        this.loadImage('Photos/A/155159.png', this.groupA, 'A', 0);
+        
+        // 如果有更多图片，可以继续添加
+        // this.loadImage('Photos/A/其他图片.jpg', this.groupA, 'A', 1);
+        
+        // B组图片
+        // this.loadImage('Photos/B/图片.jpg', this.groupB, 'B', 0);
     }
 
-    async loadImages(group, container) {
-        try {
-            const response = await fetch(`Photo/${group}`);
-            const files = await response.json();
-            
-            const images = files.filter(file => 
-                file.endsWith('.jpg') || file.endsWith('.png')
-            );
-
-            images.forEach((file, index) => {
-                this.createPhotoElement(`Photo/${group}/${file}`, container, group, index);
-            });
-        } catch (error) {
-            console.error('Error loading images:', error);
-        }
+    loadImage(src, container, group, index) {
+        this.createPhotoElement(src, container, group, index);
     }
 
     createPhotoElement(src, container, group, index) {
@@ -75,6 +66,10 @@ class Gallery {
         const img = document.createElement('img');
         img.src = src;
         img.loading = 'lazy';
+        img.onerror = () => {
+            console.error('Image failed to load:', src);
+            photoItem.style.display = 'none'; // 如果图片加载失败就隐藏容器
+        };
 
         photoItem.addEventListener('click', () => {
             this.openModal(src, group, index);
